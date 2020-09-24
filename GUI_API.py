@@ -129,20 +129,29 @@ class GUIApp(Tk):
                *for 'entry' or 'checkbox':  'label' (optional) - the name of the field (will be the keyword by default),
                                             'desc' (optional) - a description attached to the field.
                                             'default' (optional) - default value for the field
-               *for 'combobox' add: 'values' - dict of keys (to be shown to user) mapped to values (to be delivered later)
-                                    to select from.
+               *for 'combobox' add: 'values' - dict of keys (str!, to be shown to user) mapped to values (to be delivered later)
+                                                to select from (i.e. : str->any).
+                                                OR list of keys (str!) to be mapped to themselves.
                *for 'file' add: 'values' - the filetypes of the needed file. example: [('Images','*.png'),('All Files','*.*')]
 
         :returns Adds a field to the app
-                 *the fields are packed in the order of insertion
-                 *note the return value types of the fields:
-                    entry -> str, checkbox -> str, combobox -> value mapped in 'values' argument, file -> str (path)
-        """
 
+         *the fields are packed in the order of insertion
+         *note the return value types of the fields:
+            entry -> str; checkbox -> str; combobox -> return the mapped value from 'values'; file -> str (path)
+        """
+        #valitidy checks and conversions
         if not field_data.get('label'):
             field_data['label'] = keyword.title()
+        if field_type == 'combobox' and type(field_data.get('values')) == list:
+            field_data['values']={key:key for key in field_data['values']}
+        if field_type == 'combobox' and field_data.get('values') and field_data.get('default'):
+            if field_data['default'] not in field_data['values']:
+                raise Exception(f"invalid 'default' argument @setField:{keyword}")
         if keyword in self.fields_dict:
             raise Exception(f"Keyword '{keyword}' is already used by another field in the app")
+
+
 
         # initiate the Object that will represent the field
         field_obj = Field(keyword, field_type, field_data['label'])
@@ -170,7 +179,7 @@ class GUIApp(Tk):
             var_state = StringVar(value=BROWSE_FILE)
             input_field = Button(field, textvariable=var_state, command=lambda: field_obj.openFileDialog())
         else:
-            raise Exception("Check validity of 'field_data' parameter (read the documentation)")
+            raise Exception(f"Check validity of 'field_data' parameter (read the documentation) @setField:{keyword}")
         if field_data.get('default'):
             var_field.set(field_data['default'])
         input_field.place(relwidth=0.62, relx=0.38, rely=0, relheight=1)

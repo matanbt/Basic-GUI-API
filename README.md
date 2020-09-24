@@ -15,7 +15,7 @@ app = GUIApp(lambda x,operator,y : eval(x+operator+y), output_type='messagebox',
 
 # Sets the fields, i.e. the arguments of 'action_func'
 app.setField('x', 'entry',{'label':'Variable X'})
-app.setField('operator', 'combobox',{'values':['+','-','*','/','**']})
+app.setField('operator', 'combobox',values = ['+','-','*','/','**'])
 app.setField('y', 'entry',{'label':'Variable Y'})
 
 #opens the GUI App

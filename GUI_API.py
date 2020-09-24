@@ -58,6 +58,9 @@ class Field:
     def get(self):
         if self.type == 'file':
             return self.variable
+        if self.type =='combobox':
+            return self.values.get(self.variable.get()) #translate chosen key by given map
+
         return self.variable.get()
 
     def openFileDialog(self):
@@ -117,23 +120,25 @@ class GUIApp(Tk):
                                       anchor='center', background='#d2d4d2')
             self.output_label.pack(fill='both')
 
-    def setField(self, keyword, field_type, field_data=None):
+    def setField(self, keyword, field_type, **field_data):
         """
         :param keyword: unique name of the field, used as the id of the field,
                         also the *keyword* to be delivered to the action-function after submit
         :param field_type: type of the field, one of 'entry' or 'combobox' or 'checkbox' or 'file'
-        :param field_data: a python dict with the data required to create the field.
+        :param field_data: data required (or optional) to create the field.
                *for 'entry' or 'checkbox':  'label' (optional) - the name of the field (will be the keyword by default),
                                             'desc' (optional) - a description attached to the field.
-               *for 'combobox' add: 'values' - list of values to select from.
+                                            'default' (optional) - default value for the field
+               *for 'combobox' add: 'values' - dict of keys (to be shown to user) mapped to values (to be delivered later)
+                                    to select from.
                *for 'file' add: 'values' - the filetypes of the needed file. example: [('Images','*.png'),('All Files','*.*')]
 
         :returns Adds a field to the app
                  *the fields are packed in the order of insertion
+                 *note the return value types of the fields:
+                    entry -> str, checkbox -> str, combobox -> value mapped in 'values' argument, file -> str (path)
         """
 
-        if field_data is None:
-            field_data = {}
         if not field_data.get('label'):
             field_data['label'] = keyword.title()
         if keyword in self.fields_dict:
@@ -159,13 +164,15 @@ class GUIApp(Tk):
             input_field = Checkbutton(field, onvalue=True, offvalue=False, variable=var_field)
         elif field_type == 'combobox' and field_data.get('values'):
             var_field = StringVar()
-            input_field = Combobox(field, values=field_data['values'], state='readonly', textvariable=var_field)
+            input_field = Combobox(field, values=list(field_data['values'].keys()), state='readonly',
+                                   textvariable=var_field)
         elif field_type == 'file' and field_data.get('values'):
             var_state = StringVar(value=BROWSE_FILE)
             input_field = Button(field, textvariable=var_state, command=lambda: field_obj.openFileDialog())
         else:
             raise Exception("Check validity of 'field_data' parameter (read the documentation)")
-
+        if field_data.get('default'):
+            var_field.set(field_data['default'])
         input_field.place(relwidth=0.62, relx=0.38, rely=0, relheight=1)
 
         # description:
@@ -203,11 +210,11 @@ class GUIApp(Tk):
     def submit_func(self):
         """triggered on submit click, wraps 'action_func'"""
         kargs = {}
-        for key, input_field in self.fields_dict.items():
-            kargs[key] = input_field.get()
+        for key, field_obj in self.fields_dict.items():
+            kargs[key] = field_obj.get()
         if self.output_type is None:
             self.destroy()
-            self.action_func(**kargs)
+            return self.action_func(**kargs)
         else:
             output_text = str(self.action_func(**kargs))
             if self.output_type == 'inwindow':

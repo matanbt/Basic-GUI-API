@@ -1,7 +1,7 @@
 # Basic-GUI-API
 
 ### Description:
-Add basic GUI to a command-line-script with a few lines of code.
+Alows turning command-line-script to basic GUI with a few lines of code.
 
 
 ### Example:

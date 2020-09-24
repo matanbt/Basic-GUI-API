@@ -6,7 +6,7 @@ Add basic GUI to a command-line-script with a few lines of code.
 
 ### Example:
 #### Result:
-<img src="">
+<img src="https://github.com/matanbt/Basic-GUI-API/blob/master/img/demo.png">
 
 #### Code:
 ```

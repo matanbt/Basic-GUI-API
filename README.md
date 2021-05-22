@@ -1,8 +1,9 @@
 # Basic-GUI-API
 
 ### Description:
-Allows turning a command-line-script to basic form-like-GUI with a few lines of code.
-Includes in-code documentation [e.g. `help(FormGUI)`].
+A basic and intuitive API that allows turning a command-line-script to basic form-like-GUI with a few lines of code.
+
+Includes in-code documentation [e.g. by `help(FormGUI)`].
 
 ### Example:
 
